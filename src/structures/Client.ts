@@ -4,10 +4,12 @@ import {
   ClientEvents,
   Collection,
 } from 'discord.js';
-import { CommandType } from '../typings/Command';
+import { CommandType } from '../typings/Command.ts';
 import { glob } from 'glob';
-import { RegisterCommandsOptions } from '../typings/Client';
-import { Event } from './Event';
+import { RegisterCommandsOptions } from '../typings/Client.ts';
+import { Event } from './Event.ts';
+import { connect } from 'mongoose';
+const __dirname = import.meta.dirname;
 
 export class ExtendedClient extends Client {
   commands: Collection<string, CommandType> = new Collection();
@@ -17,11 +19,9 @@ export class ExtendedClient extends Client {
   }
 
   async start() {
-    console.log('Bot started');
     this.login(process.env.TOKEN);
-    console.log('Bot logged in');
     this.registerModules();
-    console.log('Modules registered');
+    this.connectDatabase();
   }
 
   async importFile(filePath: string) {
@@ -41,20 +41,17 @@ export class ExtendedClient extends Client {
   }
 
   async registerModules() {
-    console.log('Registering modules...');
     let slashCommands: ApplicationCommandDataResolvable[] = [];
-    console.log('Registering commands...');
     const commandFiles: any = await glob(
       `${__dirname}/../commands/**/*{.ts,.js}`,
       { windowsPathsNoEscape: true }
     );
     const commandFilePrefix = process.env.ENV === 'dev' ? 'file://' : '';
 
-    console.log('test');
-    console.log(commandFiles);
-
     commandFiles.forEach(async (filePath: string) => {
-      const command: CommandType = await this.importFile(commandFilePrefix + filePath);
+      const command: CommandType = await this.importFile(
+        commandFilePrefix + filePath
+      );
 
       this.commands.set(command.name, command);
       slashCommands.push(command);
@@ -81,15 +78,21 @@ export class ExtendedClient extends Client {
     const eventFiles: any = await glob(`${__dirname}/../events/**/*{.ts,.js}`, {
       windowsPathsNoEscape: true,
     });
-    console.log(eventFiles);
 
     eventFiles.forEach(async (filePath: string) => {
-      console.log(filePath);
       const event: Event<keyof ClientEvents> = await this.importFile(
         commandFilePrefix + filePath
       );
 
       this.on(event.event, event.run);
     });
+  }
+
+  async connectDatabase() {
+    const mongoConnection = process.env.MONGO_CONNECTION;
+    if (!mongoConnection) {
+      throw new Error('MongoDB connection string is not defined.');
+    }
+    connect(mongoConnection).catch(console.error);
   }
 }
