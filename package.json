@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "start": "node build/index.js",
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3"
+  },
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
+    "glob": "^10.4.3"
+  }
+}

@@ -1,0 +1,6 @@
+# Basic
+node_modules
+build
+.env
+tsconfig.json
+error.log
