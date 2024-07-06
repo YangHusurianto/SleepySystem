@@ -1,4 +1,10 @@
 {
+  "name": "@yangh/sleepy-system",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "author": "Yang Husurianto <yang.husurianto@gmail.com>",
+  "license": "MIT",
+  "type": "module",
   "scripts": {
     "start": "node build/index.js",
     "dev": "tsx src/index.ts",
