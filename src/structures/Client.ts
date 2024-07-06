@@ -6,7 +6,6 @@ import {
 } from 'discord.js';
 import { CommandType } from '../typings/Command';
 import { glob } from 'glob';
-import { promisify } from 'util';
 import { RegisterCommandsOptions } from '../typings/Client';
 import { Event } from './Event';
 
@@ -79,7 +78,7 @@ export class ExtendedClient extends Client {
       }
     });
 
-    const eventFiles: any = await glob(`${__dirname}/../events/*{.ts,.js}`, {
+    const eventFiles: any = await glob(`${__dirname}/../events/**/*{.ts,.js}`, {
       windowsPathsNoEscape: true,
     });
     console.log(eventFiles);
