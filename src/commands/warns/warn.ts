@@ -49,7 +49,6 @@ export default new Command({
 
     // create the warning first so we can insert regardless of whether the user exists
     const warning = {
-      _id: new mongoose.Types.ObjectId(),
       guildId: guild.id,
       targetUserId: target.id,
       type: 'WARN',
