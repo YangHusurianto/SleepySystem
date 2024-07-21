@@ -1,7 +1,6 @@
 import { findUser, getRecentByUser } from '../../queries/userQueries.ts';
 import { Command } from '../../structures/Command.ts';
 import { ExtendedInteraction } from '../../typings/Command.ts';
-import userSchema from '../../schemas/user.ts';
 
 import {
   ActionRowBuilder,

@@ -20,13 +20,10 @@ export class ExtendedClient extends Client {
   }
 
   async start() {
-    console.log('Starting bot')
+    console.log('Starting bot');
     this.login(process.env.TOKEN);
-    console.log('Logged in')
     this.registerModules();
-    console.log('Registered modules')
     this.connectDatabase();
-    console.log('Connected to database')
   }
 
   async importFile(filePath: string) {
@@ -61,8 +58,7 @@ export class ExtendedClient extends Client {
     if (!mongoConnection) {
       throw new Error('MongoDB connection string is not defined.');
     }
-    
-    return connect(mongoConnection).then(() => {
-      console.log('Connected to MongoDB')
-    }).catch(console.error);  }
+
+    return connect(mongoConnection).catch(console.error);
+  }
 }
