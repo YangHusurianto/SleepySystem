@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import { ClientEvents } from 'discord.js';
 import fs from 'fs';
 
-export default async function handleEvent(
+export default async function handleEvents(
   client: ExtendedClient,
   __dirname: string,
   filePrefix: string
@@ -34,8 +34,10 @@ export default async function handleEvent(
           const event = await client.importFile(filePrefix + filePath);
 
           if (event.once) {
-            mongoose.connection.once(event.name, event.execute);
+            // @ts-ignore
+            mongoose.connection.once(event.name as keyof typeof mongoose.Connection, event.execute);
           } else {
+            // @ts-ignore
             mongoose.connection.on(event.name, event.execute);
           }
         });

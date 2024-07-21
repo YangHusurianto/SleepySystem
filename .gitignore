@@ -4,3 +4,4 @@ build
 .env
 tsconfig.json
 error.log
+package-lock.json

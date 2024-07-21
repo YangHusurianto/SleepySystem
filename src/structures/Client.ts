@@ -8,7 +8,8 @@ import { CommandType } from '../typings/Command.ts';
 import { glob } from 'glob';
 import { RegisterCommandsOptions } from '../typings/Client.ts';
 import { connect } from 'mongoose';
-import handleEvent from '../functions/handlers/handleEvent.ts';
+import handleEvents from '../functions/handlers/handleEvents.ts';
+import handleCommands from '../functions/handlers/handleCommands.ts';
 const __dirname = import.meta.dirname;
 
 export class ExtendedClient extends Client {
@@ -45,41 +46,14 @@ export class ExtendedClient extends Client {
   }
 
   async registerModules() {
-    let slashCommands: ApplicationCommandDataResolvable[] = [];
-    const commandFiles: any = await glob(
-      `${__dirname}/../commands/**/*{.ts,.js}`,
-      { windowsPathsNoEscape: true }
-    );
-    const filePrefix = process.env.ENV === 'dev' ? 'file://' : '';
+    // const filePrefix = process.env.ENV === 'dev' ? 'file://' : '';
+    const filePrefix = 'file://';
 
-    commandFiles.forEach(async (filePath: string) => {
-      const command: CommandType = await this.importFile(filePrefix + filePath);
-
-      this.commands.set(command.name, command);
-      slashCommands.push(command);
-    });
-
-    this.on('ready', async () => {
-      switch (process.env.ENV) {
-        case 'dev':
-          this.registerCommands({
-            commands: slashCommands,
-            guildId: process.env.GUILD_ID,
-          });
-          break;
-        case 'prod':
-          this.registerCommands({
-            commands: slashCommands,
-          });
-          break;
-        default:
-          console.error('Invalid environment');
-      }
-    });
+    handleCommands(this, __dirname, filePrefix);
 
     console.log('Handling events now');
 
-    handleEvent(this, __dirname, filePrefix);
+    handleEvents(this, __dirname, filePrefix);
   }
 
   async connectDatabase() {
@@ -87,7 +61,8 @@ export class ExtendedClient extends Client {
     if (!mongoConnection) {
       throw new Error('MongoDB connection string is not defined.');
     }
-    connect(mongoConnection).catch(console.error);
-    console.log('Connected to MongoDB')
-  }
+    
+    return connect(mongoConnection).then(() => {
+      console.log('Connected to MongoDB')
+    }).catch(console.error);  }
 }

@@ -3,6 +3,7 @@ declare global {
     interface ProcessEnv {
       TOKEN: string;
       GUILD_ID: string;
+      MONGO_URI: string;
       ENV: "dev" | "prod" | "debug";
     }
   }
