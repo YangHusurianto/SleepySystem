@@ -1,4 +1,4 @@
-import { findUser, getRecentByUser } from '../../queries/userQueries.ts';
+import { findAndCreateUser, findUser, getRecentByUser } from '../../queries/userQueries.ts';
 import { Command } from '../../structures/Command.ts';
 import { ExtendedInteraction } from '../../typings/Command.ts';
 
@@ -97,14 +97,19 @@ export default new Command({
     var mainView,
       maxPages = 1;
 
-    [mainView, maxPages] = await getViewEmbed(
+    let viewReturn = await getViewEmbed(
       guild,
+      interaction,
       targetGuildUser,
       pageNum,
       type,
       mainView,
       maxPages
     );
+
+    if (!viewReturn) return;
+
+    [mainView, maxPages] = viewReturn;
 
     getEmbedNavigation(
       guild,
@@ -120,32 +125,44 @@ export default new Command({
 
 const getViewEmbed = async (
   guild: Guild,
+  interaction: ExtendedInteraction,
   targetGuildUser: GuildMember,
   pageNum: number,
   type: string,
   mainView: any,
   maxPages: number
-) => {
+): Promise<[EmbedBuilder, number] | undefined> => {
+  let infoReturn;
   switch (type) {
     case 'profile':
       mainView = getProfileEmbed(targetGuildUser);
       break;
     case 'infractions':
-      [mainView, maxPages] = await getInfoEmbed(
+      infoReturn = await getInfoEmbed(
         guild,
+        interaction,
         targetGuildUser,
         pageNum,
         'infractions'
       );
 
+      if (!infoReturn) return undefined;
+
+      [mainView, maxPages] = infoReturn;
+
       break;
     case 'notes':
-      [mainView, maxPages] = await getInfoEmbed(
+      infoReturn = await getInfoEmbed(
         guild,
+        interaction,
         targetGuildUser,
         pageNum,
         'notes'
       );
+
+      if (!infoReturn) return undefined;
+
+      [mainView, maxPages] = infoReturn;
 
       break;
   }
@@ -193,18 +210,25 @@ const getProfileEmbed = (member: GuildMember) => {
 
 const getInfoEmbed = async (
   guild: Guild,
+  interaction: ExtendedInteraction,
   member: GuildMember,
   pageNum: number,
   type: string
-): Promise<any> => {
+): Promise<
+  [EmbedBuilder, number] | undefined
+> => {
   try {
-    const userDoc = await findUser(guild.id, member.id);
+    const userDoc = await findAndCreateUser(guild.id, member.id);
+
+    console.log(userDoc);
 
     if (!userDoc) {
-      return {
+      interaction.reply({
         content: 'User not found in database.',
         ephemeral: true,
-      };
+      });
+
+      return undefined;
     }
 
     const info = userDoc.get(type);
@@ -382,20 +406,26 @@ const getEmbedNavigation = async (
     time: 600_000,
   });
 
+  let viewReturn;
   collector.on('collect', async (i: any) => {
     switch (i.customId) {
       case 'previous':
         nextPage.setDisabled(false);
         if (--pageNum - 1 == 1) previousPage.setDisabled(true);
 
-        [mainView, maxPages] = await getViewEmbed(
+        viewReturn = await getViewEmbed(
           guild,
+          interaction,
           targetGuildUser,
           pageNum,
           'infractions',
           mainView,
           maxPages
         );
+
+        if (!viewReturn) return;
+
+        [mainView, maxPages] = viewReturn;
 
         await i.update({
           embeds: [mainView],
@@ -406,14 +436,19 @@ const getEmbedNavigation = async (
         previousPage.setDisabled(false);
         if (++pageNum == maxPages) nextPage.setDisabled(true);
 
-        [mainView, maxPages] = await getViewEmbed(
+        viewReturn = await getViewEmbed(
           guild,
+          interaction,
           targetGuildUser,
           pageNum,
           'infractions',
           mainView,
           maxPages
         );
+
+        if (!viewReturn) return;
+
+        [mainView, maxPages] = viewReturn;
 
         await i.update({
           embeds: [mainView],
@@ -427,14 +462,19 @@ const getEmbedNavigation = async (
         nextPage.setDisabled(true);
         previousPage.setDisabled(true);
 
-        [mainView, maxPages] = await getViewEmbed(
+        viewReturn = await getViewEmbed(
           guild,
+          interaction,
           targetGuildUser,
           pageNum,
           'profile',
           mainView,
           maxPages
         );
+
+        if (!viewReturn) return;
+
+        [mainView, maxPages] = viewReturn;
 
         await i.update({
           embeds: [mainView],
@@ -449,14 +489,19 @@ const getEmbedNavigation = async (
         previousPage.setDisabled(false);
 
         pageNum = 1;
-        [mainView, maxPages] = await getViewEmbed(
+        viewReturn = await getViewEmbed(
           guild,
+          interaction,
           targetGuildUser,
           pageNum,
           'infractions',
           mainView,
           maxPages
         );
+
+        if (!viewReturn) return;
+
+        [mainView, maxPages] = viewReturn;
 
         if (pageNum == 1) previousPage.setDisabled(true);
         if (pageNum == maxPages) nextPage.setDisabled(true);
@@ -474,14 +519,19 @@ const getEmbedNavigation = async (
         previousPage.setDisabled(false);
 
         pageNum = 1;
-        [mainView, maxPages] = await getViewEmbed(
+        viewReturn = await getViewEmbed(
           guild,
+          interaction,
           targetGuildUser,
           pageNum,
           'notes',
           mainView,
           maxPages
         );
+
+        if (!viewReturn) return;
+
+        [mainView, maxPages] = viewReturn;
 
         if (pageNum == 1) previousPage.setDisabled(true);
         if (pageNum == maxPages) nextPage.setDisabled(true);
