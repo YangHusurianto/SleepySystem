@@ -1,5 +1,5 @@
 import { findAndCreateUser, findUser, getRecentByUser } from '../../queries/userQueries.ts';
-import { Command } from '../../structures/Command.ts';
+import { SlashCommand } from '../../structures/Command.ts';
 import { ExtendedInteraction } from '../../typings/Command.ts';
 
 import {
@@ -30,7 +30,7 @@ const dateOptions: Intl.DateTimeFormatOptions = {
 
 const DETAILS_PER_PAGE = 5;
 
-export default new Command({
+export default new SlashCommand({
   name: 'view',
   description: 'View information about a user',
   dmPermission: false,

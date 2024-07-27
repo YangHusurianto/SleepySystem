@@ -1,4 +1,4 @@
-import { Command } from '../../structures/Command.ts';
+import { SlashCommand } from '../../structures/Command.ts';
 import { ExtendedInteraction } from '../../typings/Command.ts';
 import { findGuild, getReplacedReason } from '../../queries/guildQueries.ts';
 
@@ -12,7 +12,7 @@ import { findAndCreateUser } from '../../queries/userQueries.ts';
 import { ExtendedClient } from '../../structures/Client.ts';
 import { logAction } from '../../utils/logs.ts';
 
-export default new Command({
+export default new SlashCommand({
   name: 'warn',
   description: 'Warn a user by sending them a private message',
   dmPermission: false,

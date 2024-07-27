@@ -1,12 +1,12 @@
 import { findGuild } from '../../queries/guildQueries.ts';
 import { findAndCreateUser } from '../../queries/userQueries.ts';
-import { Command } from '../../structures/Command.ts';
+import { SlashCommand } from '../../structures/Command.ts';
 import { logAction } from '../../utils/logs.ts';
 import { ExtendedInteraction } from '../../typings/Command.ts';
 
 import { ApplicationCommandOptionType, User, escapeMarkdown } from 'discord.js';
 
-export default new Command({
+export default new SlashCommand({
   name: 'note',
   description: 'Create a note for a user',
   dmPermission: false,

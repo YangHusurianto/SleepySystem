@@ -20,13 +20,24 @@ export default async function handleEvents(
 
     switch (folder) {
       case 'client':
-        events.forEach(async (filePath) => {
+        for (const filePath of events) {
           const event: Event<keyof ClientEvents> = await client.importFile(
             filePrefix + filePath
           );
 
+          console.log(event);
+          console.log(event.run);
+
           client.on(event.event, event.run);
-        });
+        }
+
+        // events.forEach(async (filePath) => {
+        //   const event: Event<keyof ClientEvents> = await client.importFile(
+        //     filePrefix + filePath
+        //   );
+
+        //   client.on(event.event, event.run);
+        // });
         break;
 
       case 'mongo':

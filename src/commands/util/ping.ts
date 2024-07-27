@@ -1,6 +1,6 @@
-import { Command } from "../../structures/Command.ts";
+import { SlashCommand } from "../../structures/Command.ts";
 
-export default new Command({
+export default new SlashCommand({
   name: "ping",
   description: "Pong!",
   run: async({ interaction }: { interaction: any }) => {
