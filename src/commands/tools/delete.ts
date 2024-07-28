@@ -2,7 +2,7 @@ import { MessageContextMenuCommand } from '../../structures/Command.ts';
 import { ExtendedInteraction } from '../../typings/Command.ts';
 import { logAction } from '../../utils/logs.ts';
 import { ExtendedClient } from '../../structures/Client.ts';
-import { botSelfCheck, roleHeirarchyCheck } from '../../utils/checks.ts';
+import { allChecks } from '../../utils/checks.ts';
 
 
 import { ApplicationCommandType, escapeMarkdown, User } from 'discord.js';
@@ -17,8 +17,7 @@ export default new MessageContextMenuCommand({
     const message = interaction.targetMessage;
     const target = message.author;
 
-    if (await botSelfCheck(interaction, target, client, 'delete a message of')) return;
-    if (await roleHeirarchyCheck(interaction, guild, target, member, 'delete a message of')) return;
+    if (await allChecks(interaction, guild, target, member, client, 'delete a message of' )) return;
 
     deleteMessage(interaction, message, guild, target, member);
   },
@@ -49,7 +48,7 @@ async function deleteMessage(
           `**Moderator:** ${escapeMarkdown(
             `${member.user.username} (${member.user.id}`,
             { inlineCode: true }
-          )})\n`
+          )})\n`  
       );
     })
     .catch(async (err: any) => {

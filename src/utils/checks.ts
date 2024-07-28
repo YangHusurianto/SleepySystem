@@ -2,6 +2,21 @@ import { Guild, GuildMember, InteractionResponse, Message, User } from 'discord.
 import { ExtendedInteraction } from '../typings/Command.ts';
 import { ExtendedClient } from '../structures/Client.ts';
 
+export async function allChecks(
+  interaction: ExtendedInteraction,
+  guild: Guild,
+  target: User,
+  member: GuildMember,
+  client: ExtendedClient,
+  type: string,
+): Promise<boolean> {
+  if (await botSelfCheck(interaction, target, client, type)) return true;
+  if (await roleHeirarchyCheck(interaction, guild, target, member, type))
+    return true;
+
+  return false;
+}
+
 export async function botSelfCheck(
   interaction: ExtendedInteraction,
   target: User,
