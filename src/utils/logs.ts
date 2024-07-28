@@ -1,5 +1,6 @@
 import { Guild, TextChannel } from 'discord.js';
 import { findGuild } from '../queries/guildQueries.ts';
+import { IGuild } from '../schemas/guild.ts';
 
 export async function logMessage(guild: Guild, message: string) {
   const logChannel= await getChannel(guild, 'logChannel');
@@ -18,7 +19,9 @@ export async function logAction(guild: Guild, message: string) {
 async function getChannel(guild: Guild, channel: string): Promise<TextChannel | null> {
   const guildDoc = await findGuild(guild);
 
-  const channelId = guildDoc?.settings?.get(channel);
+  if (!guildDoc) return null;
+
+  const channelId = guildDoc.settings.get(channel);
   if (channelId) {
     const channel = guild.channels.cache.get(channelId) as TextChannel;
     if (!channel) return null;
