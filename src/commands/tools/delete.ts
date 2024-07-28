@@ -17,7 +17,7 @@ export default new MessageContextMenuCommand({
     const message = interaction.targetMessage;
     const target = message.author;
 
-    if (await allChecks(interaction, guild, target, member, client, 'delete a message of' )) return;
+    if (await allChecks(interaction, client, guild, target, member, 'delete a message of' )) return;
 
     deleteMessage(interaction, message, guild, target, member);
   },

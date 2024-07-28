@@ -4,10 +4,10 @@ import { ExtendedClient } from '../structures/Client.ts';
 
 export async function allChecks(
   interaction: ExtendedInteraction,
+  client: ExtendedClient,
   guild: Guild,
   target: User,
   member: GuildMember,
-  client: ExtendedClient,
   type: string,
 ): Promise<boolean> {
   if (await botSelfCheck(interaction, target, client, type)) return true;

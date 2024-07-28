@@ -44,7 +44,7 @@ export default new SlashCommand({
     var reason = options.getString('reason') as string;
 
     // self and permission checks
-    if (await allChecks(interaction, guild, target, member, client, 'warn')) return;
+    if (await allChecks(interaction, client, guild, target, member, 'warn')) return;
 
     // get user document
     const guildDoc = await findGuild(guild);
