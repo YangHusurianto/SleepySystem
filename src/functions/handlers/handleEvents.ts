@@ -25,9 +25,6 @@ export default async function handleEvents(
             filePrefix + filePath
           );
 
-          console.log(event);
-          console.log(event.run);
-
           client.on(event.event, event.run);
         }
 

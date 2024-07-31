@@ -220,8 +220,6 @@ const getInfoEmbed = async (
   try {
     const userDoc = await findAndCreateUser(guild.id, member.id);
 
-    console.log(userDoc);
-
     if (!userDoc) {
       interaction.reply({
         content: 'User not found in database.',
