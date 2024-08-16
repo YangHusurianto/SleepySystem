@@ -22,7 +22,7 @@ export default new SlashCommand({
     {
       type: ApplicationCommandOptionType.User,
       name: 'user',
-      description: 'The user to warn',
+      description: 'The @user or user id to warn.',
       required: true,
     },
     {
