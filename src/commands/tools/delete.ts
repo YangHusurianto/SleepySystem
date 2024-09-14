@@ -40,6 +40,7 @@ async function deleteMessage(
 
       await logAction(
         guild,
+        false,
         `**DEL MSG**\n` +
           `**Author:** ${escapeMarkdown(`${target.username} (${target.id}`, {
             inlineCode: true,
