@@ -7,7 +7,6 @@ import {
   escapeMarkdown,
   User,
 } from 'discord.js';
-import mongoose from 'mongoose';
 import { findAndCreateUser } from '../../queries/userQueries.ts';
 import { ExtendedClient } from '../../structures/Client.ts';
 import { logAction } from '../../utils/logs.ts';
