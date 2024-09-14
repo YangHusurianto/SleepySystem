@@ -36,7 +36,7 @@ export async function updateInfraction(
   }
 }
 
-export async function removeInfraction(userId: string, guildId: string, infractionNumber: string) {
+export async function removeInfraction(userId: string, guildId: string, infractionNumber: number) {
   try {
     return await User.findOneAndUpdate(
       { userId: userId, guildId: guildId },
@@ -51,7 +51,7 @@ export async function removeInfraction(userId: string, guildId: string, infracti
   }
 }
 
-export async function findInfraction(guildId: string, infractionNumber: string) {
+export async function findInfraction(guildId: string, infractionNumber: number) {
   try {
     return await User.findOne({
       guildId: guildId,
