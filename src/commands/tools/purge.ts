@@ -75,7 +75,7 @@ async function purgeMessages(
             `${interaction.member.user.username} (${interaction.member.user.id}`,
             { inlineCode: true }
           )})\n` +
-          `PURGE LOG:\n${messages.map((m: any) => `"${m.author.username}": `+ m.content).join('\n')}`
+          `PURGE LOG:\n${messages.map((m: any) => `${m.author.username}: `+ m.content).join('\n')}`
       );
     })
     .catch(async (err: any) => {
