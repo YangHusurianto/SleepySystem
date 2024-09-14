@@ -31,6 +31,12 @@ export default new SlashCommand({
       description: 'The reason',
       required: true,
     },
+    {
+      type: ApplicationCommandOptionType.Boolean,
+      name: 'private',
+      description: 'Whether the note should be logged privately',
+      required: false,
+    },
   ],
   run: async ({
     client,
@@ -57,6 +63,7 @@ export default new SlashCommand({
     //log to channel
     return await logAction(
       guild,
+      isPrivate,
       `**WARN** | Case #${Number(guildDoc.caseNumber) - 1}\n` +
         `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
           inlineCode: true,
