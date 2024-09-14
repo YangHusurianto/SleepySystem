@@ -23,18 +23,11 @@ export default new SlashCommand({
       description: 'The note',
       required: true,
     },
-    {
-      type: ApplicationCommandOptionType.Boolean,
-      name: 'private',
-      description: 'Whether the note should be logged privately',
-      required: false,
-    }
   ],
   run: async ({ interaction }: { interaction: ExtendedInteraction }) => {
     const { options, guild, member } = interaction;
     const target = options.getUser('user') as User;
     var noteInfo = options.getString('note') as string;
-    const isPrivate = options.getBoolean('private') || false;
     const date = new Date();
 
     try {
@@ -72,7 +65,6 @@ export default new SlashCommand({
 
       return await logAction(
         guild,
-        isPrivate,
         `**NOTE** | Case #${guildDoc.caseNumber}\n` +
           `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
             inlineCode: true,

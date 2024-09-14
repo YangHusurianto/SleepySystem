@@ -68,7 +68,6 @@ async function purgeMessages(
 
       await logAction(
         guild,
-        false,
         `**PURGE**\n` +
           `**Amount:** ${messages.size}\n` +
           `**Channel:** ${channel}\n` +

@@ -122,7 +122,6 @@ async function banUser(
   //log to channel
   logAction(
     guild,
-    false,
     `**BAN** | Case #${guildDoc.caseNumber}\n` +
       `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
         inlineCode: true,
