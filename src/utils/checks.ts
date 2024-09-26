@@ -74,8 +74,8 @@ export async function roleHeirarchyCheck(
             'Failed to fetch member for permissions check. Attempting to ban user anyway...',
           ephemeral: true,
         };
-        if (interaction.replied) await interaction.editReply(banCheck);
-        else await interaction.reply(banCheck);
+        if (interaction.replied) return await interaction.editReply(banCheck);
+        else return await interaction.reply(banCheck);
 
         return false;
       }
