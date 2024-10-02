@@ -27,7 +27,7 @@ export async function findGuild(guild: Guild): Promise<IGuild | null> {
 
 export async function getAutoTags(guild: Guild) {
   const guildDoc = await findGuild(guild);
-  return guildDoc?.autoTags;
+  return guildDoc?.tags;
 }
 
 export async function getChannelTags(guild: Guild) {
@@ -37,7 +37,7 @@ export async function getChannelTags(guild: Guild) {
 
 export async function getReplacedReason(guild: Guild, reason: string): Promise<string> {
   const guildDoc = await findGuild(guild);
-  let finalReason: string = guildDoc?.autoTags?.get(reason) || '';
+  let finalReason: string = guildDoc?.tags?.get(reason) || '';
 
   if (!finalReason) {
     const channelTags = guildDoc?.channelTags;

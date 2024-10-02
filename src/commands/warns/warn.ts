@@ -37,6 +37,28 @@ export default new SlashCommand({
       required: false,
     },
   ],
+  autocomplete: async (interaction) => {
+    if (!interaction.guild) return;
+
+    const focusedValue = interaction.options.getFocused();
+    const guild = await findGuild(interaction.guild);
+    if (!guild) return;
+    let tags = guild.tags;
+
+    const filtered = Array.from(tags).filter(([key, _value]) =>
+      key.startsWith(focusedValue)
+    );
+
+    if (!filtered.length && focusedValue.length === 0) {
+      return await interaction.respond(
+        Array.from(tags).map(([key, _value]) => ({ name: key, value: key }))
+      );
+    }
+
+    return await interaction.respond(
+      filtered.map(([key, _value]) => ({ name: key, value: key }))
+    );
+  },
   run: async ({
     client,
     interaction,
@@ -135,28 +157,3 @@ async function warnUser(
       console.log('Failed to dm user about warn.');
     });
 }
-
-
-
-
-
-
-//   async autocomplete(interaction) {
-//     const focusedValue = interaction.options.getFocused();
-//     const guild = await findGuild(interaction.guild);
-//     let tags = guild.autoTags;
-
-//     const filtered = Array.from(tags).filter(([key, _value]) =>
-//       key.startsWith(focusedValue)
-//     );
-
-//     if (!filtered.length && focusedValue.length === 0) {
-//       return await interaction.respond(
-//         Array.from(tags).map(([key, _value]) => ({ name: key, value: key }))
-//       );
-//     }
-
-//     return await interaction.respond(
-//       filtered.map(([key, _value]) => ({ name: key, value: key }))
-//     );
-//   },

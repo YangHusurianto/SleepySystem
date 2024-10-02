@@ -1,5 +1,6 @@
 import {
   ApplicationCommandType,
+  AutocompleteInteraction,
   ChatInputApplicationCommandData,
   CommandInteraction,
   CommandInteractionOptionResolver,
@@ -30,6 +31,7 @@ export type CommandType = {
   userPermissions?: PermissionResolvable[];
   cooldown?: number;
   dmPermission?: boolean;
+  autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>;
   run: RunFunction;
 } & ChatInputApplicationCommandData;
 
