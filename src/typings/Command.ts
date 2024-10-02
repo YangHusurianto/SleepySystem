@@ -40,7 +40,3 @@ export type MessageContextMenuCommandType = {
   type: ApplicationCommandType.Message;
   run: RunFunction;
 } & MessageApplicationCommandData;
-
-// export type MessageContextMenuCommandType = CommandType & {
-//   type: ApplicationCommandType.Message;
-// };
