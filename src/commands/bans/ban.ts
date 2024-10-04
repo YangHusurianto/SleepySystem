@@ -64,7 +64,7 @@ async function banUser(
 ) {
   const guildDoc = (await findGuild(guild)) as IGuild;
   // pull the tags list and convert to value
-  let tags = guildDoc.autoTags;
+  let tags = guildDoc.tags;
   reason = tags.get(reason) ?? reason;
 
   // create the ban first so we can insert regardless of whether the user exists
