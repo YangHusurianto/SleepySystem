@@ -45,7 +45,7 @@ async function deleteMessage(
           `**Author:** ${escapeMarkdown(`${target.username} (${target.id}`, {
             inlineCode: true,
           })})\n` +
-          `**Content:** ${message.content}\n` +
+          `**Content:** ||${message.content}||\n` +
           `**Channel:** ${message.channel}\n` +
           `**Moderator:** ${escapeMarkdown(
             `${member.user.username} (${member.user.id}`,
