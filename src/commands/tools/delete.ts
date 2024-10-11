@@ -27,7 +27,7 @@ async function deleteMessage(
   interaction: ExtendedInteraction,
   message: any,
   guild: any,
-  target: any,
+  target: User,
   member: any
 ) {
   await message
@@ -42,7 +42,7 @@ async function deleteMessage(
         guild,
         false,
         `**DEL MSG**\n` +
-          `**Author:** ${escapeMarkdown(`${target.username} (${target.id}`, {
+          `**Author:** ${target} | ${escapeMarkdown(`${target.username} (${target.id}`, {
             inlineCode: true,
           })})\n` +
           `**Content:** ||${message.content}||\n` +

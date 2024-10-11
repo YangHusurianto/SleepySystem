@@ -87,7 +87,7 @@ export default new SlashCommand({
       guild,
       isPrivate,
       `**WARN** | Case #${Number(guildDoc.caseNumber) - 1}\n` +
-        `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
+        `**Target:** ${target} | ${escapeMarkdown(`${target.username} (${target.id}`, {
           inlineCode: true,
         })})\n` +
         `**Moderator:** ${escapeMarkdown(
