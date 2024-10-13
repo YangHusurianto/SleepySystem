@@ -29,7 +29,7 @@ export default async function handleCommands(
       case 'dev':
         client.registerCommands({
           commands: commands,
-          guildId: process.env.GUILD_ID,
+          // guildId: process.env.GUILD_ID,
         });
         break;
       case 'prod':

@@ -44,6 +44,7 @@ export async function botSelfCheck(
   return false;
 }
 
+// Return false if the check has passed or needs to be bypassed
 export async function roleHeirarchyCheck(
   interaction: ExtendedInteraction,
   guild: Guild,
@@ -68,24 +69,24 @@ export async function roleHeirarchyCheck(
       return false;
     })
     .catch(async (err) => {
+      let permCheck: any;
+
       if (type === 'ban') {
-        const banCheck = {
+        permCheck = {
           content:
             'Failed to fetch member for permissions check. Attempting to ban user anyway...',
           ephemeral: true,
         };
-        if (interaction.replied) return await interaction.editReply(banCheck);
-        else return await interaction.reply(banCheck);
-
-        return false;
       }
 
-      console.error(err);
-      const banCheck = {
-        content: 'Failed to fetch member for permissions check.',
+      permCheck = {
+        content: 'Failed to fetch member for permissions check. Proceeding anyway...',
         ephemeral: true,
       };
-      if (interaction.replied) return await interaction.editReply(banCheck);
-      else return await interaction.reply(banCheck);
+
+      if (interaction.replied) await interaction.editReply(permCheck);
+      else await interaction.reply(permCheck);
+
+      return false;
     });
 }
