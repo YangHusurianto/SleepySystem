@@ -33,10 +33,13 @@ async function deleteMessage(
   await message
     .delete()
     .then(async () => {
-      await interaction.reply({
+      const confirmationReply = {
         content: `Message (${message.content}) deleted.`,
         ephemeral: true,
-      });
+      }
+
+      if (interaction.replied) await interaction.editReply(confirmationReply);
+      else await interaction.reply(confirmationReply);
 
       await logAction(
         guild,
@@ -55,9 +58,12 @@ async function deleteMessage(
     })
     .catch(async (err: any) => {
       console.error(err);
-      return await interaction.reply({
+      const errorReply = {
         content: 'Failed to delete message.',
         ephemeral: true,
-      });
+      };
+
+      if (interaction.replied) await interaction.editReply(errorReply);
+      else await interaction.reply(errorReply);
     });
 }
