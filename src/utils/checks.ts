@@ -1,6 +1,7 @@
 import { Guild, GuildMember, InteractionResponse, Message, User } from 'discord.js';
 import { ExtendedInteraction } from '../typings/Command.ts';
 import { ExtendedClient } from '../structures/Client.ts';
+import { replyToInteraction } from './utils.ts';
 
 export async function allChecks(
   interaction: ExtendedInteraction,
@@ -10,83 +11,81 @@ export async function allChecks(
   member: GuildMember,
   type: string,
 ): Promise<boolean> {
-  if (await botSelfCheck(interaction, target, client, type)) return true;
-  if (await roleHeirarchyCheck(interaction, guild, target, member, type))
+  let content = '';
+
+  const botSelfCheckContent = botSelfCheck(interaction, target, client, type);
+  if (botSelfCheckContent) {
+    let reply = {
+      content: botSelfCheckContent,
+      ephemeral: true,
+    };
+
+    await replyToInteraction(interaction, reply);
+
     return true;
+  }
+
+  const roleHeirarchyCheckContent = await roleHeirarchyCheck(guild, target, member, type);
+  if (roleHeirarchyCheckContent) {
+    let reply = {
+      content: roleHeirarchyCheckContent,
+      ephemeral: true,
+    };
+
+    await replyToInteraction(interaction, reply);
+
+    if (roleHeirarchyCheckContent.includes('fetch')) {
+      return false;
+    }
+
+    return true;
+  }
 
   return false;
 }
 
-export async function botSelfCheck(
+export function botSelfCheck(
   interaction: ExtendedInteraction,
   target: User,
   client: ExtendedClient,
   type: string
-): Promise<boolean | Message<boolean> | InteractionResponse<boolean>> {
+): string {
   if (target.id === client.user?.id) {
-    const selfCheck = {
-      content: `I cannot ${type} myself!`,
-      ephemeral: true,
-    };
-    if (interaction.replied) return await interaction.editReply(selfCheck);
-    else return await interaction.reply(selfCheck);
+    return `I cannot ${type} myself!`;
   }
 
   if (target.id === interaction.member.id) {
-    const selfCheck = {
-      content: `You cannot ${type} yourself!`,
-      ephemeral: true,
-    };
-    if (interaction.replied) return await interaction.editReply(selfCheck);
-    else return await interaction.reply(selfCheck);
+    return `You cannot ${type} yourself!`;
   }
 
-  return false;
+  return '';
 }
 
 // Return false if the check has passed or needs to be bypassed
 export async function roleHeirarchyCheck(
-  interaction: ExtendedInteraction,
   guild: Guild,
   target: User,
   member: GuildMember,
   type: string
-) {
-  return await guild.members
+): Promise<string> {
+  let content = '';
+
+  await guild.members
     .fetch(target.id)
     .then(async (targetMember) => {
       if (
         member.roles.highest.comparePositionTo(targetMember.roles.highest) < 1
       ) {
-        const banCheck = {
-          content: `You cannot ${type} a member with a higher or equal role than you!`,
-          ephemeral: true,
-        };
-        if (interaction.replied) return await interaction.editReply(banCheck);
-        else return await interaction.reply(banCheck);
+          content = `You cannot ${type} a member with a higher or equal role than you!`;
       }
-
-      return false;
     })
     .catch(async (err) => {
-      let permCheck: any;
+      content = 'Failed to fetch member for permissions check. Proceeding anyway...';
 
       if (type === 'ban') {
-        permCheck = {
-          content:
-            'Failed to fetch member for permissions check. Attempting to ban user anyway...',
-          ephemeral: true,
-        };
+        content ='Failed to fetch member for permissions check. Attempting to ban user anyway...';
       }
-
-      permCheck = {
-        content: 'Failed to fetch member for permissions check. Proceeding anyway...',
-        ephemeral: true,
-      };
-
-      if (interaction.replied) await interaction.editReply(permCheck);
-      else await interaction.reply(permCheck);
-
-      return false;
     });
+
+  return content;
 }

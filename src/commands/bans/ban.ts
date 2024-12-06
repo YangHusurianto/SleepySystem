@@ -14,6 +14,7 @@ import {
   GuildMember,
   User,
 } from 'discord.js';
+import { replyToInteraction } from '../../utils/utils.ts';
 
 
 export default new SlashCommand({
@@ -45,7 +46,7 @@ export default new SlashCommand({
     const target = options.getUser('user') as User;
     var reason = options.getString('reason') as string;
 
-    interaction.deferReply();
+    await interaction.deferReply();
 
     if (await allChecks(interaction, client, guild, target, member, 'ban'))
       return;
@@ -102,11 +103,9 @@ async function banUser(
     .then(async () => {
       let banConfirmation = `<:check:1196693134067896370> ${target} has been banned.`;
 
-      if (interaction.replied || interaction.deferred)
-        await interaction.editReply(banConfirmation);
-      else await interaction.reply(banConfirmation);
+      await replyToInteraction(interaction, banConfirmation);
     })
-    .catch(console.error);
+    .catch();
 
   guildDoc.incrementCaseNumber();
   await guildDoc.save().catch(async (err) => {
