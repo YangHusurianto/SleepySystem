@@ -34,6 +34,12 @@ export default new SlashCommand({
       description: 'The reason for the ban',
       required: true,
     },
+    {
+      type: ApplicationCommandOptionType.Boolean,
+      name: 'private',
+      description: 'Whether the note should be logged privately',
+      required: false,
+    },
   ],
   run: async ({
     client,
@@ -45,13 +51,14 @@ export default new SlashCommand({
     const { options, guild, member } = interaction;
     const target = options.getUser('user') as User;
     var reason = options.getString('reason') as string;
+    const isPrivate = options.getBoolean('private') || false as boolean;
 
     await interaction.deferReply();
 
     if (await allChecks(interaction, client, guild, target, member, 'ban'))
       return;
 
-    banUser(interaction, client, guild, target, member, reason);
+    banUser(interaction, client, guild, target, member, reason, isPrivate);
   },
 });
 
@@ -61,7 +68,8 @@ async function banUser(
   guild: Guild,
   target: User,
   member: GuildMember,
-  reason: string
+  reason: string,
+  isPrivate: boolean
 ) {
   const guildDoc = (await findGuild(guild)) as IGuild;
   // pull the tags list and convert to value
@@ -121,7 +129,7 @@ async function banUser(
   //log to channel
   logAction(
     guild,
-    false,
+    isPrivate,
     `**BAN** | Case #${guildDoc.caseNumber}\n` +
       `**Target:** ${escapeMarkdown(`${target.username} (${target.id}`, {
         inlineCode: true,
