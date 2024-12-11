@@ -1,4 +1,9 @@
-import { findAndCreateUser, findUser, getRecentByUser } from '../../queries/userQueries.ts';
+import {
+  findAndCreateUser,
+  findUser,
+  getRecentByUser,
+} from '../../queries/userQueries.ts';
+import { ExtendedClient } from '../../structures/Client.ts';
 import { SlashCommand } from '../../structures/Command.ts';
 import { ExtendedInteraction } from '../../typings/Command.ts';
 
@@ -85,11 +90,20 @@ export default new SlashCommand({
       ],
     },
   ],
-  run: async ({ interaction }: { interaction: ExtendedInteraction }) => {
+  run: async ({
+    client,
+    interaction,
+  }: {
+    client: ExtendedClient;
+    interaction: ExtendedInteraction;
+  }) => {
     const { options, guild } = interaction;
 
     const targetUser = interaction.options.getUser('user') as User;
-    const targetGuildUser = await guild.members.fetch(targetUser.id);
+    // use guildMember of possible else get user through client.users.fetch
+    const targetGuildUser = await guild.members.fetch(targetUser.id).catch(() => { return client.users.fetch(targetUser.id) });
+    // const targetGuildUser = (await guild.members.fetch(targetUser.id)) ?? client.users.fetch(targetUser.id);
+
     const pageNum = options.getInteger('page') ?? 1;
 
     const type = interaction.options.getSubcommand();
@@ -126,7 +140,7 @@ export default new SlashCommand({
 const getViewEmbed = async (
   guild: Guild,
   interaction: ExtendedInteraction,
-  targetGuildUser: GuildMember,
+  targetGuildUser: User | GuildMember,
   pageNum: number,
   type: string,
   mainView: any,
@@ -170,20 +184,21 @@ const getViewEmbed = async (
   return [mainView, maxPages];
 };
 
-const getProfileEmbed = (member: GuildMember) => {
-  const profileEmbed = new EmbedBuilder()
-    .setColor(member.displayHexColor)
-    .setAuthor({
-      name: `${member.user.username}`,
-      iconURL: member.user.displayAvatarURL(),
-    })
-    .addFields(
-      {
-        name: 'User Information',
-        value: `${escapeMarkdown(member.user.username)} (${member.user.id}) <@${
-          member.user.id
-        }>`,
-      },
+const getProfileEmbed = (member: User | GuildMember) => {
+  const username =
+    member instanceof User ? member.username : member.user.username;
+  const user = member instanceof User ? member : member.user;
+  const color = member instanceof User ? 'Random' : member.displayHexColor;
+  let data = [
+    {
+      name: 'User Information',
+      value: `${escapeMarkdown(username)} (${member.id}) <@${member.id}>`,
+    }
+  ];
+
+  if (member instanceof GuildMember) {
+    data = [
+      ...data,
       {
         name: 'Roles',
         value: member.roles.cache.map((role) => role.toString()).join(', '),
@@ -193,16 +208,29 @@ const getProfileEmbed = (member: GuildMember) => {
         value: member.joinedAt
           ? `<t:${Math.round(member.joinedAt.getTime() / 1000)}:F>`
           : 'Unknown',
-      },
-      {
-        name: 'Joined Discord',
-        value: `<t:${Math.round(member.user.createdAt.getTime() / 1000)}:F>`,
-      },
-      {
-        name: 'ID',
-        value: `\`\`\`ini\nUser = ${member.user.id}\`\`\``,
       }
-    )
+    ] 
+  }
+
+  data = [
+    ...data,
+    {
+      name: 'Joined Discord',
+      value: `<t:${Math.round(user.createdAt.getTime() / 1000)}:F>`,
+    },
+    {
+      name: 'ID',
+      value: `\`\`\`ini\nUser = ${member.id}\`\`\``,
+    }
+  ]
+
+  const profileEmbed = new EmbedBuilder()
+    .setColor(color)
+    .setAuthor({
+      name: `${username}`,
+      iconURL: member.displayAvatarURL(),
+    })
+    .addFields(data)
     .setTimestamp();
 
   return profileEmbed;
@@ -211,12 +239,10 @@ const getProfileEmbed = (member: GuildMember) => {
 const getInfoEmbed = async (
   guild: Guild,
   interaction: ExtendedInteraction,
-  member: GuildMember,
+  member: User | GuildMember,
   pageNum: number,
   type: string
-): Promise<
-  [EmbedBuilder, number] | undefined
-> => {
+): Promise<[EmbedBuilder, number] | undefined> => {
   try {
     const userDoc = await findAndCreateUser(guild.id, member.id);
 
@@ -235,10 +261,12 @@ const getInfoEmbed = async (
     if (pageNum > maxPages) pageNum = maxPages;
 
     if (!info.length) {
+      const username =
+        member instanceof User ? member.username : member.user.username;
       const embed = new EmbedBuilder()
         .setAuthor({
-          name: `${member.user.username} (${member.user.id})`,
-          iconURL: member.user.displayAvatarURL(),
+          name: `${username} (${member.id})`,
+          iconURL: member.displayAvatarURL(),
         })
         .addFields({
           name: `No ${type}`,
@@ -273,14 +301,16 @@ const getInfoEmbed = async (
 };
 
 const getInfoEmbedContent = (
-  member: GuildMember,
+  member: User | GuildMember,
   pageNum: number,
   info: any,
   type: string,
   recents: Array<{ name: string; value: number }>
 ) => {
+  const username =
+    member instanceof User ? member.username : member.user.username;
   const embed = new EmbedBuilder().setAuthor({
-    name: `${member.user.username} (${member.id})`,
+    name: `${username} (${member.id})`,
     iconURL: member.displayAvatarURL(),
   });
 
@@ -340,7 +370,7 @@ const getInfoEmbedContent = (
 
 const getEmbedNavigation = async (
   guild: Guild,
-  targetGuildUser: GuildMember,
+  targetGuildUser: User | GuildMember,
   interaction: ExtendedInteraction,
   type: string,
   mainView: EmbedBuilder,
