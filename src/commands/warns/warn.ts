@@ -69,7 +69,7 @@ export default new SlashCommand({
     const { options, guild, member } = interaction;
     const target = options.getUser('user') as User;
     var reason = options.getString('reason') as string;
-    const isPrivate = options.getBoolean('private') || false;
+    const isPrivate = options.getBoolean('private') || false as boolean;
 
     // self and permission checks
     if (await allChecks(interaction, client, guild, target, member, 'warn')) return;
